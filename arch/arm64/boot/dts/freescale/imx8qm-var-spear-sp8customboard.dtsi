@@ -859,7 +859,6 @@
 };
 
 &pciea {
-	ext_osc = <1>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pciea>;
 	reset-gpio = <&lsio_gpio4 29 GPIO_ACTIVE_LOW>;
