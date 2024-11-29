@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2017-2020 NXP
- * Copyright 2019-2022 Variscite Ltd.
+ * Copyright 2019-2023 Variscite Ltd.
  */
 
 /dts-v1/;
@@ -59,12 +59,12 @@
 			no-map;
 		};
 
-		decoder_rpc: decoder-rpc@0x92000000 {
+		decoder_rpc: decoder-rpc@92000000 {
 			reg = <0 0x92000000 0 0x200000>;
 			no-map;
 		};
 
-		encoder_rpc: encoder-rpc@0x92200000 {
+		encoder_rpc: encoder-rpc@92200000 {
 			reg = <0 0x92200000 0 0x200000>;
 			no-map;
 		};
@@ -144,7 +144,7 @@
 	phy-mode = "rgmii";
 	phy-handle = <&ethphy0>;
 	fsl,magic-packet;
-	status = "disabled";
+	status = "okay";
 	phy-supply = <&reg_phy0_pwr>;
 
 	mdio {
@@ -156,9 +156,9 @@
 			reg = <4>;
 			qca,disable-smarteee;
 			vddio-supply = <&vddio0>;
-			/* reset-gpios = <&lsio_gpio1 2 GPIO_ACTIVE_LOW>; */
-			reset-assert-us = <100000>;
-			reset-deassert-us = <100000>;
+			reset-gpios = <&lsio_gpio1 2 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <20000>;
 
 			vddio0: vddio-regulator {
 				regulator-min-microvolt = <1800000>;
@@ -178,42 +178,12 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog>, <&pinctrl_relays>, <&pinctrl_camen>, <&pinctrl_inputs>, <&pinctrl_gpiom>;
-
-	pinctrl_inputs: inputgrp {
-		fsl,pins = <
-			IMX8QXP_QSPI0B_SS0_B_LSIO_GPIO3_IO23            0x06000020 /* IN1 */
-			IMX8QXP_QSPI0B_DATA2_LSIO_GPIO3_IO20			0x06000020 /* Boardcfg 0 */
-			IMX8QXP_QSPI0B_DATA1_LSIO_GPIO3_IO19			0x06000020 /* Boardcfg 1 */
-			IMX8QXP_QSPI0B_DATA0_LSIO_GPIO3_IO18			0x06000020 /* Boardcfg 2 */
-		>;
-	};
-
-	pinctrl_camen: camengrp {
-		fsl,pins = <
-			IMX8QXP_CSI_PCLK_LSIO_GPIO3_IO00                0x06000020 /* CAM1_EN */
-			IMX8QXP_USDHC1_WP_LSIO_GPIO4_IO21               0x06000020 /* CAM2_EN */
-		>;
-	};
-
-	pinctrl_relays: relaysgrp {
-		fsl,pins = <
-			IMX8QXP_QSPI0B_DQS_LSIO_GPIO3_IO22              0x06000020 /* Relay 1 */
-			IMX8QXP_QSPI0B_SCLK_LSIO_GPIO3_IO17             0x06000020 /* Relay 2*/
-		>;
-	};
-
-	pinctrl_gpiom: gpiomgrp {
-		fsl,pins = <
-			IMX8QXP_QSPI0B_DATA3_LSIO_GPIO3_IO21            0x06000020 /* nRESET gpio expander */
-		>;
-	};
+	pinctrl-0 = <&pinctrl_hog>;
 
 	pinctrl_hog: hoggrp {
 		fsl,pins = <
 			IMX8QXP_MCLK_OUT0_ADMA_ACM_MCLK_OUT0			0x0600004c
 			IMX8QXP_COMP_CTL_GPIO_1V8_3V3_GPIORHB_PAD		0x000514a0
-			IMX8QXP_USDHC1_CD_B_LSIO_GPIO4_IO22				0x06000020 /* Heartbeat */			
 		>;
 	};
 
@@ -341,7 +311,7 @@
 	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
 		fsl,pins = <
 			IMX8QXP_SPI0_CS1_LSIO_GPIO1_IO07			0x00000021
-			IMX8QXP_USDHC1_CD_B_LSIO_GPIO4_IO22			0x00000021 
+			IMX8QXP_USDHC1_CD_B_LSIO_GPIO4_IO22			0x00000021
 		>;
 	};
 
@@ -426,7 +396,7 @@
 			0xffff /* GPIO3 => don't touch */
 			0xffff /* GPIO4 => don't touch */
 		>;
-		status = "disabled";
+		status = "okay";
 	};
 };
 
@@ -446,7 +416,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi3>;
 	cs-gpios = <&lsio_gpio0 16 GPIO_ACTIVE_LOW>;
-	status = "disabled";
+	status = "okay";
 
 	/* Resistive touch controller */
 	ads7846@0 {
@@ -469,7 +439,7 @@
 		ti,debounce-rep = /bits/ 16 <1>;
 		ti,settle-delay-usec = /bits/ 16 <150>;
 		ti,keep-vref-on;
-		status = "disabled";
+		status = "okay";
 	};
 };
 
@@ -554,34 +524,19 @@
 	status = "okay";
 };
 
-&vpu_decoder {
-	boot-region = <&decoder_boot>;
-	rpc-region = <&decoder_rpc>;
-	reg-csr = <0x2d040000>;
-	core_type = <1>;
-	status = "disabled";
+&vpu {
+	compatible = "nxp,imx8qxp-vpu";
+	status = "okay";
 };
 
-&vpu_encoder {
-	boot-region = <&encoder_boot>;
-	rpc-region = <&encoder_rpc>;
-	reserved-region = <&encoder_reserved>;
-	reg-rpc-system = <0x40000000>;
-	resolution-max = <1920 1920>;
-	mbox-names = "enc1_tx0", "enc1_tx1", "enc1_rx";
-	mboxes = <&mu1_m0 0 0
-		  &mu1_m0 0 1
-		  &mu1_m0 1 0>;
-	status = "disabled";
+&vpu_core0 {
+	reg = <0x2d040000 0x10000>;
+	memory-region = <&decoder_boot>, <&decoder_rpc>;
+	status = "okay";
+};
 
-	core0@1020000 {
-		compatible = "fsl,imx8-mu1-vpu-m0";
-		reg = <0x1020000 0x20000>;
-		reg-csr = <0x1050000 0x10000>;
-		interrupts = <GIC_SPI 470 IRQ_TYPE_LEVEL_HIGH>;
-		fsl,vpu_ap_mu_id = <17>;
-		fw-buf-size = <0x200000>;
-		rpc-buf-size = <0x80000>;
-		print-buf-size = <0x80000>;
-	};
+&vpu_core1 {
+	reg = <0x2d050000 0x10000>;
+	memory-region = <&encoder_boot>, <&encoder_rpc>;
+	status = "okay";
 };
