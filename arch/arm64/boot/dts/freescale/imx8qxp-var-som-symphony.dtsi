@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2017-2020 NXP
- * Copyright 2019-2022 Variscite Ltd.
+ * Copyright 2019-2023 Variscite Ltd.
  */
 
 #include "imx8qxp-var-som.dtsi"
 
 / {
+	aliases {
+		gpio8 = &pca9534;
+	};
+
 	chosen {
 		stdout-path = &lpuart3;
 	};
@@ -27,11 +31,33 @@
 				     90 91 92 93 94 95 96 97 98 99
 				    100>;
 		default-brightness-level = <80>;
-		status = "disabled";
+		status = "okay";
 	};
 
 	gpio-keys {
 		compatible = "gpio-keys";
+		status = "okay";
+
+		back {
+			label = "Back";
+			gpios = <&pca9534 1 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+			linux,code = <KEY_BACK>;
+		};
+
+		home {
+			label = "Home";
+			gpios = <&pca9534 2 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+			linux,code = <KEY_HOME>;
+		};
+
+		 menu {
+			label = "Menu";
+			gpios = <&pca9534 3 GPIO_ACTIVE_LOW>;
+			wakeup-source;
+			linux,code = <KEY_MENU>;
+		};
 	};
 
 	leds {
@@ -39,38 +65,8 @@
 
 		heartbeat {
 			label = "heartbeat";
-			gpios = <&lsio_gpio4 22 GPIO_ACTIVE_HIGH>;
+			gpios = <&pca9534 0 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
-		};
-
-		relay1_enable {
-			label = "RELAY1";
-			gpios = <&lsio_gpio3 22 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-		};
-		
-		relay2_enable {
-			label = "RELAY2";
-			gpios = <&lsio_gpio3 17 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-		};
-
-		gpioexpander_reset {
-			label = "nRESET_GPIO_EXPANDER";
-			gpios = <&lsio_gpio3 21 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-		};
-
-		camera1_enable {
-			label = "CAM1_EN";
-			gpios = <&lsio_gpio3 0 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
-		};
-
-		camera2_enable {
-			label = "CAM2_EN";
-			gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
 		};
 	};
 
@@ -81,7 +77,7 @@
 		height-mm = <87>;
 		label = "gktw70sdae4se";
 		data-mapping = "jeida-24";
-		status = "disabled";
+		status = "okay";
 
 		panel-timing {
 			clock-frequency = <29232000>;
@@ -111,12 +107,33 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
+		reg_phy1_vsel: regulator-phy1-vsel {
+			compatible = "regulator-fixed";
+			regulator-name = "phy1_vsel";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			gpio = <&pca9534 6 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		reg_phy1_pwr: regulator-phy1-pwr {
+			compatible = "regulator-fixed";
+			vin-supply = <&reg_phy1_vsel>;
+			regulator-name = "phy1_supply";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			gpio = <&pca9534 7 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+			regulator-always-on;
+		};
+
 		reg_usb_otg1_vbus: regulator-usb-otg1-vbus {
 			compatible = "regulator-fixed";
 			regulator-name = "usb_otg1_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			/* gpio = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>; */
+			gpio = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 		};
 
@@ -125,7 +142,7 @@
 			regulator-name = "sd_pwr";
 			regulator-min-microvolt = <3000000>;
 			regulator-max-microvolt = <3000000>;
-			/* gpio = <&lsio_gpio1 7 GPIO_ACTIVE_HIGH>; */
+			gpio = <&lsio_gpio1 7 GPIO_ACTIVE_HIGH>;
 			off-on-delay = <3480>;
 			enable-active-high;
 		};
@@ -218,9 +235,9 @@
 			qca,disable-smarteee;
 			vddio-supply = <&vddio1>;
 			adi,phy-mode-override = "rgmii";
-			/* reset-gpios = <&pca9534 5 GPIO_ACTIVE_LOW>; */
-			reset-assert-us = <100000>;
-			reset-deassert-us = <100000>;
+			reset-gpios = <&pca9534 5 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <20000>;
 
 			vddio1: vddio-regulator {
 				regulator-min-microvolt = <1800000>;
@@ -233,21 +250,17 @@
 &fec2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec2>;
-	phy-mode = "rgmii-txid";
-	/* phy-handle = <&ethphy1>; */
+	phy-mode = "rgmii-rxid";
+	phy-handle = <&ethphy1>;
 	fsl,magic-packet;
 	status = "okay";
-    fixed-link {
-        speed = <1000>;
-        full-duplex;
-    };
-	/* phy-supply = <&reg_phy1_pwr>; */
+	phy-supply = <&reg_phy1_pwr>;
 };
 
 &flexcan3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan3>;
-	status = "disabled";
+	status = "okay";
 };
 
 &gpu_3d0 {
@@ -259,31 +272,12 @@
 	#size-cells = <0>;
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c1_alt>;
+	pinctrl-0 = <&pinctrl_lpi2c1>;
 	status = "okay";
-
-	/* DS1337 RTC module */
-	rtc@68 {
-		status = "okay";
-		compatible = "dallas,ds1337";
-		reg = <0x68>;
-	};
-
-	gpiom1: gpio@20 {
-		compatible = "microchip,mcp23017";
-		gpio-controller;
-		#gpio-cells = <2>;
-		reg = <0x20>;
-	};
-
-	mcp4651: mcp4651@28 {
-		compatible = "microchip,mcp4651-103";
-		reg = <0x28>;
-	};
 
 	/* MIPI-CSI2 sensor */
 	ov5640_mipi: ov5640_mipi@3c {
-		status = "disabled";
+		status = "okay";
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
 		clocks = <&xtal24m>;
@@ -304,9 +298,28 @@
 		};
 	};
 
+	/* GPIO expander */
+	pca9534:gpio@20 {
+		compatible = "nxp,pca9534";
+		reg = <0x20>;
+		gpio-controller;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca9534>;
+		interrupt-parent = <&lsio_gpio3>;
+		interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
+		#gpio-cells = <2>;
+
+		usb3_sel_hog {
+			gpio-hog;
+			gpios = <4 0>;
+			output-low;
+			line-name = "usb3_sel";
+		};
+	};
+
 	/* USB-C controller */
 	typec_ptn5150: typec@3d {
-		status = "disabled";
+		status = "okay";
 		compatible = "nxp,ptn5150";
 		reg = <0x3d>;
 		pinctrl-names = "default";
@@ -329,11 +342,11 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c2>;
-	status = "disabled";
+	status = "okay";
 
 	/* Capacitive touch controller */
 	ft5x06_ts: ft5x06_ts@38 {
-		status = "disabled";
+		status = "okay";
 		compatible = "edt,edt-ft5406";
 		reg = <0x38>;
 		pinctrl-names = "default";
@@ -348,7 +361,7 @@
 
 	/* DS1337 RTC module */
 	rtc@68 {
-		status = "disabled";
+		status = "okay";
 		compatible = "dallas,ds1337";
 		reg = <0x68>;
 	};
@@ -360,7 +373,7 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c3>;
-	status = "disabled";
+	status = "okay";
 
 	/* Parallel CSI sensor */
 	ov5640: ov5640@3c {
@@ -424,14 +437,6 @@
 		>;
 	};
 
-	pinctrl_lpi2c1_alt: lpi2c1altgrp {
-		fsl,pins = <
-			IMX8QXP_MIPI_DSI0_GPIO0_00_ADMA_I2C1_SCL 	0x06000021
-			IMX8QXP_USB_SS3_TC2_ADMA_I2C1_SDA			0x06000021
-			IMX8QXP_USB_SS3_TC0_LSIO_GPIO4_IO03			0x06000021 
-		>;
-	};
-
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
 			IMX8QXP_USB_SS3_TC0_ADMA_I2C1_SCL			0x06000021
@@ -471,15 +476,6 @@
 		fsl,pins = <
 			IMX8QXP_SCU_GPIO0_00_ADMA_UART3_RX			0x06000020
 			IMX8QXP_SCU_GPIO0_01_ADMA_UART3_TX			0x06000020
-		>;
-	};
-
-	pinctrl_lpspi1: lpspi1grp {
-		fsl,pins = <
-			IMX8QXP_SAI0_TXFS_ADMA_SPI1_SCK             0x0600004c
-			IMX8QXP_CSI_EN_ADMA_SPI1_SDI                0x0600004c
-			IMX8QXP_CSI_MCLK_ADMA_SPI1_SDO              0x0600004c
-			IMX8QXP_CSI_RESET_LSIO_GPIO3_IO03           0x00000021
 		>;
 	};
 
@@ -525,23 +521,9 @@
 		>;
 	};
 
-    /*
 	pinctrl_pwm_mipi_lvds0: mipi_lvds0_pwm_grp {
 		fsl,pins = <
 			IMX8QXP_MIPI_DSI0_GPIO0_00_MIPI_DSI0_PWM0_OUT		0x00000020
-		>;
-	};
-    */
-
-	pinctrl_pwm3: pwm3grp {
-		fsl,pins = <
-			IMX8QXP_UART1_CTS_B_LSIO_PWM3_OUT                   0x06000020
-		>;
-	};
-
-	pinctrl_pwm2: pwm2grp {
-		fsl,pins = <
-			IMX8QXP_UART1_RTS_B_LSIO_PWM2_OUT					0x06000020
 		>;
 	};
 
@@ -573,7 +555,7 @@
 };
 
 &isi_0 {
-	status = "disabled";
+	status = "okay";
 
 	cap_device {
 		status = "okay";
@@ -597,7 +579,7 @@
 };
 
 &isi_4 {
-	status = "disabled";
+	status = "okay";
 	interface = <6 0 2>;
 	parallel_csi;
 
@@ -615,7 +597,7 @@
 };
 
 &ldb1_phy {
-	status = "disabled";
+	status = "okay";
 };
 
 &ldb1 {
@@ -643,59 +625,13 @@
 	status = "disabled";
 };
 
-&lpspi1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpspi1>;
-	cs-gpios = <&lsio_gpio3 3 GPIO_ACTIVE_LOW>;
-	status = "okay";
-
-	ksz8794: ksz8794@0 {
-		compatible = "microchip,ksz8794";
-		reg = <0>;
-		reset-gpios = <&lsio_gpio0 26 GPIO_ACTIVE_LOW>;
-		spi-max-frequency = <500000>;
-		
-		ports {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			port@0 {
-                phy-mode = "internal";
-				reg = <0>;
-				label = "wan";
-			};
-			port@1 {
-                phy-mode = "internal";
-				reg = <1>;
-				label = "cam_ir";
-			};
-			port@2 {
-                phy-mode = "internal";
-				reg = <2>;
-				label = "cam_ov";
-			};
-			port@4 {
-                phy-mode = "rgmii-txid";
-				reg = <4>;
-				label = "cpu";
-				ethernet = <&fec2>;
-				fixed-link {
-					speed = <1000>;
-					full-duplex;
-				};
-			};
-		};
-	};
-};
-
 &lpspi2 {
 	#address-cells = <1>;
 	#size-cells = <0>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi2>;
-	/* cs-gpios = <&lsio_gpio1 0 GPIO_ACTIVE_LOW>; */
-	status = "disabled";
+	cs-gpios = <&lsio_gpio1 0 GPIO_ACTIVE_LOW>;
+	status = "okay";
 
 	spidev@0 {
 		compatible = "var,spidev";
@@ -716,7 +652,7 @@
 &lpuart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart2>;
-	status = "disabled";
+	status = "okay";
 };
 
 /* Console */
@@ -769,7 +705,7 @@
 &mipi_csi_0 {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "disabled";
+	status = "okay";
 
 	/* Camera 0  MIPI CSI-2 (CSIS0) */
 	port@0 {
@@ -784,7 +720,7 @@
 &parallel_csi {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "disabled";
+	status = "okay";
 
 	port@0 {
 		reg = <0>;
@@ -794,41 +730,30 @@
 	};
 };
 
+&phyx1 {
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
+	status = "okay";
+};
+
 &pcieb{
-	compatible = "fsl,imx8qxp-pcie","snps,dw-pcie";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcieb>;
 	reset-gpio = <&lsio_gpio0 29 GPIO_ACTIVE_LOW>;
-	ext_osc = <1>;
-	status = "disabled";
-};
-
-&pwm2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pwm2>;
 	status = "okay";
 };
 
-&pwm3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pwm3>;
-	status = "okay";
-};
-
-/*
 &pwm_mipi_lvds0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm_mipi_lvds0>;
 	status = "okay";
 };
-*/
 
 &rtc {
 	status = "disabled";
 };
 
 &usbphy1 {
-	status = "disabled";
+	status = "okay";
 };
 
 &usbotg1 {
@@ -838,7 +763,7 @@
 	adp-disable;
 	power-polarity-active-high;
 	disable-over-current;
-	status = "disabled";
+	status = "okay";
 	dr_mode = "host";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb1otg>;
@@ -864,13 +789,18 @@
 	};
 };
 
-&vpu_decoder {
+&vpu_core0 {
 	status = "okay";
 };
 
-&vpu_encoder {
+&vpu_core1 {
 	status = "okay";
 
+};
+
+&phyx1_lpcg {
+	clocks = <&xtal100m>, <&hsio_per_clk>,
+		<&hsio_per_clk>, <&hsio_per_clk>;
 };
 
 /delete-node/ &adc1;
@@ -878,3 +808,5 @@
 /delete-node/ &emvsim0;
 /delete-node/ &emvsim0_lpcg;
 /delete-node/ &hdmi_rx_pxl_link_lpcg;
+/delete-node/ &hsio_refa_clk;
+/delete-node/ &hsio_refb_clk;
