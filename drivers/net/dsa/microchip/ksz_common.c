@@ -3042,6 +3042,11 @@ static int ksz_switch_detect(struct ksz_device *dev)
 	u32 id32;
 	int ret;
 
+	/* read chip id: for some reason it reads wrong value //Saber */
+	ret = ksz_read16(dev, REG_CHIP_ID0, &id16);
+	if (ret)
+		return ret;
+	
 	/* read chip id */
 	ret = ksz_read16(dev, REG_CHIP_ID0, &id16);
 	if (ret)
