@@ -680,6 +680,8 @@
 				 reg = <4>;
 				 label = "cpu";
 				 ethernet = <&fec2>;
+                		 rx-internal-delay-ps = <2000>; /* Set RX delay to 2000 ps */
+                		 tx-internal-delay-ps = <2000>; /* Set TX delay to 2000 ps */
 				 fixed-link {
 					 speed = <1000>;
 					 full-duplex;
