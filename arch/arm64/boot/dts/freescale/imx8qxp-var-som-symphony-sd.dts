@@ -32,5 +32,5 @@
 	bus-width = <4>;
 	cd-gpios = <&lsio_gpio4 22 GPIO_ACTIVE_LOW>;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
-	status = "okay";
+	status = "disabled";
 };
