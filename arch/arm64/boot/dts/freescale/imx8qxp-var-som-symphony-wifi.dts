@@ -31,6 +31,17 @@
 	};
 };
 */
+
+&lsio_gpio4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2_vsel>;
+
+	wifi_vsel {
+		gpios = <&lsio_gpio4 20 GPIO_ACTIVE_HIGH>; /* GPIO 20 definition */
+		status = "okay";
+	};
+};
+
 /* Bluetooth */
 &lpuart0 {
 	status = "okay";
@@ -52,6 +63,6 @@
 	brcmf: bcrmf@1 {
 		reg = <1>;
 		compatible = "brcm,bcm4329-fmac";
-		vsel-gpios = <&lsio_gpio4 20 GPIO_ACTIVE_HIGH>;  /* Voltage select, if needed */
+		vsel-gpios = <&lsio_gpio4 20 GPIO_ACTIVE_HIGH>; /* Voltage select GPIO */
 	};
 };
