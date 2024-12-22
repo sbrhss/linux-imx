@@ -44,6 +44,7 @@
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_wifi>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_wifi>;
 	bus-width = <4>;
+	no-sd;
 	non-removable;
 	keep-power-in-suspend;
 	status = "okay";
