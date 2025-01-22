@@ -233,14 +233,14 @@
  &fec2 {
 	 pinctrl-names = "default";
 	 pinctrl-0 = <&pinctrl_fec2>;
-	 phy-mode = "rgmii";
-	 #address-cells = <1>;
-	 #size-cells = <0>;
+	 phy-mode = "rgmii-txid";
 	 /* phy-handle = <&ethphy1>; */
-	 // fsl,magic-packet;
+	 fsl,magic-packet;
+ 	 phy-reset-duration = <100>;
+ 	 phy-reset-post-delay = <100>;
 	 status = "okay";
 	 fixed-link {
-		 speed = <100>;
+		 speed = <1000>;
 		 full-duplex;
 	 };
 	 /* phy-supply = <&reg_phy1_pwr>; */
@@ -657,10 +657,9 @@
 		 compatible = "microchip,ksz8794";
 		 reg = <0>;
 		 reset-gpios = <&lsio_gpio0 26 GPIO_ACTIVE_LOW>;
-		spi-max-frequency = <30000000>;
+		spi-max-frequency = <500000>;
 		spi-cpha;
 		spi-cpol;
-		phy-mode = "rmii";
 		 
 		 ports {
 			 #address-cells = <1>;
@@ -681,12 +680,10 @@
 				 label = "cam_ov";
 			 };
 			 port@4 {
-				 // phy-mode = "rgmii-txid";
+				 phy-mode = "rgmii-txid";
 				 reg = <4>;
 				 label = "cpu";
 				 ethernet = <&fec2>;
-                		 // rx-internal-delay-ps = <2000>; /* Set RX delay to 2000 ps */
-                		 // tx-internal-delay-ps = <2000>; /* Set TX delay to 2000 ps */
 				 fixed-link {
 					 speed = <100>;
 					 full-duplex;
