@@ -243,7 +243,6 @@
 		 speed = <1000>;
 		 full-duplex;
 	 };
-	 /* phy-supply = <&reg_phy1_pwr>; */
  };
  
  &flexcan3 {
@@ -666,17 +665,14 @@
 			 #address-cells = <1>;
 			 #size-cells = <0>;
 			 port@0 {
-				 phy-mode = "internal";
 				 reg = <0>;
 				 label = "wan";
 			 };
 			 port@1 {
-				 phy-mode = "internal";
 				 reg = <1>;
 				 label = "cam_ir";
 			 };
 			 port@2 {
-				 phy-mode = "internal";
 				 reg = <2>;
 				 label = "cam_ov";
 			 };
