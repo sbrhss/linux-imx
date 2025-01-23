@@ -240,7 +240,7 @@
  	 phy-reset-post-delay = <100>;
 	 status = "okay";
 	 fixed-link {
-		 speed = <100>;
+		 speed = <1000>;
 		 full-duplex;
 	 };
 	 /* phy-supply = <&reg_phy1_pwr>; */
@@ -654,12 +654,13 @@
 	 status = "okay";
  
 	 ksz8794: ksz8794@0 {
-		 compatible = "microchip,ksz8794";
-		 reg = <0>;
-		 reset-gpios = <&lsio_gpio0 26 GPIO_ACTIVE_LOW>;
+		compatible = "microchip,ksz8794";
+		reg = <0>;
+		reset-gpios = <&lsio_gpio0 26 GPIO_ACTIVE_LOW>;
 		spi-max-frequency = <500000>;
 		spi-cpha;
 		spi-cpol;
+		phy-mode = "rgmii-txid";
 		 
 		 ports {
 			 #address-cells = <1>;
@@ -680,12 +681,11 @@
 				 label = "cam_ov";
 			 };
 			 port@4 {
-				 phy-mode = "rgmii-txid";
 				 reg = <4>;
 				 label = "cpu";
 				 ethernet = <&fec2>;
 				 fixed-link {
-					 speed = <100>;
+					 speed = <1000>;
 					 full-duplex;
 				 };
 			 };
