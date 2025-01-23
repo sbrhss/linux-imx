@@ -659,20 +659,21 @@
 		spi-max-frequency = <500000>;
 		spi-cpha;
 		spi-cpol;
-		phy-mode = "rgmii-txid";
-		 
 		 ports {
 			 #address-cells = <1>;
 			 #size-cells = <0>;
 			 port@0 {
+				 phy-mode = "internal";
 				 reg = <0>;
 				 label = "wan";
 			 };
 			 port@1 {
+				 phy-mode = "internal";
 				 reg = <1>;
 				 label = "cam_ir";
 			 };
 			 port@2 {
+				 phy-mode = "internal";
 				 reg = <2>;
 				 label = "cam_ov";
 			 };
@@ -680,6 +681,7 @@
 				 reg = <4>;
 				 label = "cpu";
 				 ethernet = <&fec2>;
+				 phy-mode = "rgmii-txid";
 				 fixed-link {
 					 speed = <1000>;
 					 full-duplex;
