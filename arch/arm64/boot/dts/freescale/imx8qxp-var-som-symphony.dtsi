@@ -759,7 +759,7 @@
 	 };
  };
 
-$lsio_gpio4{
+&lsio_gpio4{
 	/*Add camera2_enable GPIO Definition */
 	camera2_enable: camera2_enable {
 		 label = "CAM2_EN";
