@@ -36,41 +36,17 @@
  
 	 leds {
 		 compatible = "gpio-leds";
- 
+
 		 heartbeat {
 			 label = "heartbeat";
 			 gpios = <&lsio_gpio4 22 GPIO_ACTIVE_HIGH>;
 			 linux,default-trigger = "heartbeat";
 		 };
- 
-		 relay1_enable {
-			 label = "RELAY1";
-			 gpios = <&lsio_gpio3 22 GPIO_ACTIVE_HIGH>;
-			 default-state = "off";
-		 };
-		 
-		 relay2_enable {
-			 label = "RELAY2";
-			 gpios = <&lsio_gpio3 17 GPIO_ACTIVE_HIGH>;
-			 default-state = "off";
-		 };
- 
+
 		 gpioexpander_reset {
 			 label = "nRESET_GPIO_EXPANDER";
 			 gpios = <&lsio_gpio3 21 GPIO_ACTIVE_LOW>;
 			 default-state = "off";
-		 };
- 
-		 camera1_enable {
-			 label = "CAM1_EN";
-			 gpios = <&lsio_gpio3 0 GPIO_ACTIVE_HIGH>;
-			 default-state = "on";
-		 };
- 
-		 camera2_enable {
-			 label = "CAM2_EN";
-			 gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
-			 default-state = "on";
 		 };
 	 };
  
@@ -745,28 +721,52 @@
  
  &lsio_gpio3 {
 	 /* Enable wakeup-source from all pca9534 gpio-keys*/
- 
 	 pad-wakeup-num = <1>;	/* Total number of wakeup pads in gpio1 bank */
- 
 	 /*
 	  IMX8QXP_MIPI_CSI0_MCLK_OUT: PCA9534 IRQ pin id
 	  SC_PAD_WAKEUP_LOW_LVL:      trigger type
 	  4:                          PCA9534 IRQ gpio pin
 	 */
 	 pad-wakeup = <IMX8QXP_MIPI_CSI0_MCLK_OUT SC_PAD_WAKEUP_LOW_LVL 4>;
- };
- 
- &lsio_gpio3 {
+
+
 	 pinctrl-names = "default";
 	 pinctrl-0 = <&pinctrl_mipi_csi0>;
- 
 	 cam_buf_hog {
 		 gpio-hog;
 		 gpios = <24 0>;
 		 output-high;
 		 line-name = "cam_buf_en";
 	 };
+
+	/*Add RELAY1 GPIO Definition */
+	relay1_gpio: relay1_gpio {
+		gpios = <&lsio_gpio3 22 GPIO_ACTIVE_HIGH>;
+		label = "RELAY1";
+	};
+
+	/*Add RELAY2 GPIO Definition */
+	relay2_gpio: relay2_gpio {
+		gpios = <&lsio_gpio3 17 GPIO_ACTIVE_HIGH>;
+		label = "RELAY2";
+	};
+
+	/*Add camera1_enable GPIO Definition */
+	camera1_enable: camera1_enable {
+		 label = "CAM1_EN";
+		 gpios = <&lsio_gpio3 0 GPIO_ACTIVE_HIGH>;
+		 default-state = "on";
+	 };
  };
+
+$lsio_gpio4{
+	/*Add camera2_enable GPIO Definition */
+	camera2_enable: camera2_enable {
+		 label = "CAM2_EN";
+		 gpios = <&lsio_gpio4 21 GPIO_ACTIVE_HIGH>;
+		 default-state = "on";
+	 };
+};
  
  &mipi_csi_0 {
 	 #address-cells = <1>;
